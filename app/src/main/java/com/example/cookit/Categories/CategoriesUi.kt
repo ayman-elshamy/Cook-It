@@ -1,5 +1,7 @@
 package com.example.cookit.Categories
 
+import android.util.Log
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.cookit.api.RetrofitInstance
 import com.example.cookit.meals.MealsScreen
+import com.example.cookit.ui.theme.GRADIENT
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -58,6 +61,8 @@ fun CategoriesScreen(
                 call: Call<CategoryResponse>,
                 response: Response<CategoryResponse>
             ) {
+                Log.d("MEALS", "Response = ${response.code()}")
+
                 if (response.isSuccessful) {
                     categories = response.body()?.categories ?: emptyList()
                 }
@@ -67,7 +72,7 @@ fun CategoriesScreen(
                 call: Call<CategoryResponse>,
                 t: Throwable
             ) {
-
+                Log.e("MEALS", "Error = ${t.message}")
             }
         })
     }
@@ -84,15 +89,19 @@ fun CategoriesScreen(
             items(categories) { category ->
                 CategoryItem(
                     category = category,
+                    isSelected = category.nameCategory == selectedCategory,
                     onClick = {
-                        selectedCategory = category.nameCategory
+                        selectedCategory = if (selectedCategory == category.nameCategory) {
+                            null
+                        } else {
+                            category.nameCategory
+                        }
                     }
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
 
         if (selectedCategory.isNullOrEmpty()) {
             Box(
@@ -118,25 +127,18 @@ fun CategoriesScreen(
 @Composable
 fun CategoryItem(
     category: Categories,
+    isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val rainbowGradient = Brush.sweepGradient(
-        colors = listOf(
-            Color(0xFFFFD54F), // Yellow
-            Color(0xFF81C784), // Green
-            Color(0xFF4FC3F7), // Cyan/Blue
-            Color(0xFFBA68C8), // Purple
-            Color(0xFFE57373), // Pink/Red
-            Color(0xFFFFB74D), // Orange
-            Color(0xFFFFD54F)  // Back to Yellow to close sweep
-        )
+        colors = GRADIENT
     )
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .clickable {}
+            .clickable { onClick() }
             .padding(4.dp)
     ) {
         AsyncImage(
@@ -144,6 +146,8 @@ fun CategoryItem(
             contentDescription = category.nameCategory,
             modifier = Modifier
                 .size(80.dp)
+                .border(width = 3.dp, brush = rainbowGradient, shape = CircleShape)
+                .padding(4.dp)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
@@ -153,6 +157,7 @@ fun CategoryItem(
         Text(
             text = category.nameCategory ?: "UNKNOWN",
             fontSize = 14.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
             fontFamily = FontFamily.Monospace,
             color = Color.Black
         )
