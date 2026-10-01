@@ -2,9 +2,8 @@ package com.example.cookit.meals
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,9 +47,7 @@ fun MealsScreen(category: String) {
                 }
             }
 
-            override fun onFailure(call: Call<MealsResponse>, t: Throwable) {
-
-            }
+            override fun onFailure(call: Call<MealsResponse>, t: Throwable) {}
         })
     }
 
@@ -74,33 +71,44 @@ fun MealUi(mealsItem: List<Meals>, modifier: Modifier = Modifier) {
 
 @Composable
 fun MealItem(meal: Meals) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFE7E5EA))
-            .padding(12.dp)
+            .height(210.dp)
+            .padding(8.dp),
+        contentAlignment = Alignment.TopCenter
     ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
+                .align(Alignment.BottomCenter)
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color(0xFFE7E5EA)),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Text(
+                text = meal.mealName ?: "UNKNOWN",
+                textAlign = TextAlign.Center,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                maxLines = 2,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 65.dp, start = 8.dp, end = 8.dp)
+            )
+        }
+
+
         AsyncImage(
             model = meal.mealImage,
             contentDescription = meal.mealName,
             modifier = Modifier
-                .size(110.dp)
-                .clip(RoundedCornerShape(12.dp)),
+                .size(105.dp)
+                .clip(RoundedCornerShape(16.dp)),
             contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = meal.mealName ?: "UNKNOWN",
-            textAlign = TextAlign.Center,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black,
-            maxLines = 2,
-            modifier = Modifier.fillMaxWidth()
         )
     }
 }
